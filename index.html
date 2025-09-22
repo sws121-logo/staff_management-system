@@ -5,9 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SalaryBox - Employee Management System</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/chart.js">
     <style>
         :root {
             --primary: #4361ee;
+            --primary-gradient: linear-gradient(135deg, #4361ee, #3a0ca3);
             --secondary: #3a0ca3;
             --success: #4cc9f0;
             --danger: #f72585;
@@ -20,6 +22,9 @@
             --halfday: #fbbf24;
             --weekoff: #a3a3a3;
             --holiday: #c084fc;
+            --background: #f5f7fb;
+            --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s ease;
         }
         
         * {
@@ -30,8 +35,9 @@
         }
         
         body {
-            background-color: #f5f7fb;
+            background-color: var(--background);
             color: #333;
+            transition: var(--transition);
         }
         
         .container {
@@ -40,27 +46,64 @@
             background: white;
             min-height: 100vh;
             position: relative;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            overflow-x: hidden;
         }
         
         header {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            background: var(--primary-gradient);
             color: white;
             padding: 20px;
             text-align: center;
-            border-bottom-left-radius: 15px;
-            border-bottom-right-radius: 15px;
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 60%);
+            transform: rotate(30deg);
         }
         
         .logo {
-            font-size: 24px;
+            font-size: 28px;
             font-weight: bold;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .logo::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 2px;
         }
         
         .tagline {
             font-size: 14px;
             opacity: 0.9;
+            margin-bottom: 10px;
+        }
+        
+        .date-display {
+            font-size: 14px;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 5px 12px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-top: 5px;
         }
         
         .nav-bottom {
@@ -72,37 +115,67 @@
             justify-content: space-around;
             background: white;
             padding: 12px 0;
-            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.1);
             z-index: 100;
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
         }
         
         .nav-item {
             text-align: center;
             color: #888;
             font-size: 12px;
+            transition: var(--transition);
+            position: relative;
+            padding: 5px 10px;
+            border-radius: 15px;
         }
         
         .nav-item.active {
             color: var(--primary);
+            background: rgba(67, 97, 238, 0.1);
         }
         
         .nav-item i {
             font-size: 20px;
             display: block;
             margin-bottom: 4px;
+            transition: var(--transition);
+        }
+        
+        .nav-item.active i {
+            transform: scale(1.1);
         }
         
         .content {
             padding: 20px;
-            padding-bottom: 70px;
+            padding-bottom: 80px;
         }
         
         .card {
             background: white;
-            border-radius: 12px;
-            padding: 15px;
-            margin-bottom: 15px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: var(--card-shadow);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5px;
+            height: 100%;
+            background: var(--primary-gradient);
         }
         
         .card-title {
@@ -112,30 +185,54 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
         }
         
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
+            gap: 15px;
+            margin-bottom: 15px;
         }
         
         .stat-item {
             background: var(--light);
-            border-radius: 10px;
-            padding: 12px;
+            border-radius: 12px;
+            padding: 15px;
             text-align: center;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .stat-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .stat-item::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--primary);
+            opacity: 0.7;
         }
         
         .stat-value {
-            font-size: 20px;
+            font-size: 24px;
             font-weight: bold;
             margin-bottom: 5px;
+            transition: var(--transition);
         }
         
         .stat-label {
             font-size: 12px;
             color: #666;
+            font-weight: 500;
         }
         
         .present { color: var(--present); }
@@ -144,19 +241,60 @@
         .weekoff { color: var(--weekoff); }
         
         .btn {
-            padding: 12px 20px;
-            border-radius: 8px;
+            padding: 14px 20px;
+            border-radius: 10px;
             border: none;
             font-weight: 600;
             cursor: pointer;
             display: inline-flex;
             align-items: center;
             justify-content: center;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 5px;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.5);
+            opacity: 0;
+            border-radius: 100%;
+            transform: scale(1, 1) translate(-50%);
+            transform-origin: 50% 50%;
+        }
+        
+        .btn:active::after {
+            animation: ripple 1s ease-out;
+        }
+        
+        @keyframes ripple {
+            0% {
+                transform: scale(0, 0);
+                opacity: 1;
+            }
+            20% {
+                transform: scale(25, 25);
+                opacity: 1;
+            }
+            100% {
+                opacity: 0;
+                transform: scale(40, 40);
+            }
         }
         
         .btn-primary {
             background: var(--primary);
             color: white;
+        }
+        
+        .btn-primary:hover {
+            background: var(--secondary);
+            box-shadow: 0 5px 15px rgba(67, 97, 238, 0.3);
         }
         
         .btn-block {
@@ -165,22 +303,41 @@
         
         .attendance-actions {
             display: flex;
-            gap: 10px;
-            margin: 15px 0;
+            gap: 12px;
+            margin: 20px 0;
         }
         
         .attendance-btn {
             flex: 1;
-            padding: 10px;
-            border-radius: 8px;
+            padding: 15px;
+            border-radius: 10px;
             text-align: center;
             font-weight: 600;
             cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
         }
         
         .punch-in {
             background: var(--present);
             color: white;
+            box-shadow: 0 4px 10px rgba(76, 201, 240, 0.3);
+        }
+        
+        .punch-in:hover {
+            background: #22c55e;
+            box-shadow: 0 6px 15px rgba(34, 197, 94, 0.4);
+        }
+        
+        .punch-out {
+            background: #e5e7eb;
+            color: #4b5563;
+        }
+        
+        .punch-out:hover {
+            background: #d1d5db;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         }
         
         .employee-list {
@@ -190,22 +347,33 @@
         .employee-item {
             display: flex;
             align-items: center;
-            padding: 12px 0;
+            padding: 15px 0;
             border-bottom: 1px solid #eee;
+            transition: var(--transition);
+            cursor: pointer;
+            border-radius: 8px;
+            padding-left: 10px;
+            padding-right: 10px;
+        }
+        
+        .employee-item:hover {
+            background: #f9fafb;
+            transform: translateX(5px);
         }
         
         .employee-avatar {
             width: 50px;
             height: 50px;
             border-radius: 50%;
-            background: #ddd;
+            background: var(--primary-gradient);
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: bold;
             font-size: 20px;
             margin-right: 15px;
-            color: #666;
+            color: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
         
         .employee-info {
@@ -215,11 +383,12 @@
         .employee-name {
             font-weight: 600;
             margin-bottom: 4px;
+            color: #374151;
         }
         
         .employee-status {
             font-size: 12px;
-            color: #666;
+            color: #6b7280;
         }
         
         .calendar {
@@ -232,12 +401,13 @@
             text-align: center;
             font-weight: 600;
             margin-bottom: 10px;
+            color: #4b5563;
         }
         
         .calendar-grid {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
-            gap: 5px;
+            gap: 6px;
         }
         
         .calendar-day {
@@ -245,38 +415,57 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 8px;
+            border-radius: 10px;
             font-weight: 500;
             cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+        }
+        
+        .calendar-day:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            z-index: 2;
         }
         
         .day-present {
             background: #dcfce7;
             color: var(--present);
+            border: 2px solid #bbf7d0;
         }
         
         .day-absent {
             background: #fee2e2;
             color: var(--absent);
+            border: 2px solid #fecaca;
         }
         
         .day-halfday {
             background: #fef3c7;
             color: var(--halfday);
+            border: 2px solid #fde68a;
         }
         
         .day-weekoff {
             background: #f3f4f6;
             color: var(--weekoff);
+            border: 2px solid #e5e7eb;
         }
         
         .day-holiday {
             background: #f3e8ff;
             color: var(--holiday);
+            border: 2px solid #e9d5ff;
         }
         
         .day-empty {
             background: transparent;
+            cursor: default;
+        }
+        
+        .day-empty:hover {
+            transform: none;
+            box-shadow: none;
         }
         
         .tab-container {
@@ -290,14 +479,31 @@
         }
         
         .tab {
-            padding: 10px 15px;
+            padding: 12px 20px;
             cursor: pointer;
             font-weight: 500;
+            transition: var(--transition);
+            position: relative;
         }
         
         .tab.active {
-            border-bottom: 2px solid var(--primary);
             color: var(--primary);
+        }
+        
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: var(--primary);
+            border-radius: 3px 3px 0 0;
+        }
+        
+        .tab:hover {
+            color: var(--primary);
+            background: rgba(67, 97, 238, 0.05);
         }
         
         .tab-content {
@@ -306,6 +512,12 @@
         
         .tab-content.active {
             display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         
         .salary-breakdown {
@@ -315,8 +527,15 @@
         .salary-item {
             display: flex;
             justify-content: space-between;
-            padding: 8px 0;
+            padding: 10px 0;
             border-bottom: 1px solid #f0f0f0;
+            transition: var(--transition);
+        }
+        
+        .salary-item:hover {
+            background: #f9fafb;
+            padding-left: 10px;
+            border-radius: 8px;
         }
         
         .salary-item:last-child {
@@ -325,13 +544,53 @@
         
         .face-recognition {
             text-align: center;
-            padding: 20px 0;
+            padding: 30px 0;
+            background: #f9fafb;
+            border-radius: 16px;
+            margin: 20px 0;
+            position: relative;
+            overflow: hidden;
         }
         
         .face-icon {
             font-size: 80px;
             color: var(--primary);
             margin-bottom: 15px;
+            transition: var(--transition);
+            position: relative;
+            z-index: 2;
+        }
+        
+        .face-recognition.active .face-icon {
+            color: var(--present);
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        .scan-line {
+            position: absolute;
+            height: 5px;
+            width: 100%;
+            background: var(--primary);
+            top: 30%;
+            opacity: 0;
+            z-index: 1;
+        }
+        
+        .face-recognition.active .scan-line {
+            animation: scan 2s infinite;
+            opacity: 1;
+        }
+        
+        @keyframes scan {
+            0% { top: 30%; }
+            50% { top: 70%; }
+            100% { top: 30%; }
         }
         
         .company-name {
@@ -341,43 +600,62 @@
         }
         
         .punch-time {
-            font-size: 24px;
+            font-size: 28px;
             font-weight: bold;
             margin: 15px 0;
+            color: var(--dark);
         }
         
         .location-info {
             font-size: 14px;
             color: #666;
             margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
         }
         
         .meeting-item {
-            padding: 12px 0;
+            padding: 15px 0;
             border-bottom: 1px solid #eee;
+            transition: var(--transition);
+            cursor: pointer;
+            border-radius: 8px;
+            padding-left: 10px;
+            padding-right: 10px;
+        }
+        
+        .meeting-item:hover {
+            background: #f9fafb;
+            transform: translateX(5px);
         }
         
         .meeting-time {
             font-weight: 600;
             margin-bottom: 5px;
+            color: #374151;
         }
         
         .meeting-location {
             font-size: 14px;
-            color: #666;
+            color: #6b7280;
             margin-bottom: 5px;
         }
         
         .meeting-duration {
             font-size: 12px;
-            color: #888;
+            color: #9ca3af;
         }
         
         .badge {
-            padding: 4px 8px;
+            padding: 5px 10px;
             border-radius: 20px;
             font-size: 12px;
             font-weight: 600;
+            display: inline-block;
+            margin-right: 8px;
+            margin-top: 8px;
         }
         
         .badge-important {
@@ -389,13 +667,260 @@
             background: #e0e7ff;
             color: var(--primary);
         }
+        
+        .chart-container {
+            height: 200px;
+            margin: 20px 0;
+            position: relative;
+        }
+        
+        .ai-attendance {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 20px;
+            border-radius: 16px;
+            margin: 20px 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .ai-attendance::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320'%3E%3Cpath fill='%23ffffff' fill-opacity='0.1' d='M0,128L48,117.3C96,107,192,85,288,112C384,139,480,213,576,218.7C672,224,768,160,864,138.7C960,117,1056,139,1152,149.3C1248,160,1344,160,1392,160L1440,160L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z'%3E%3C/path%3E%3C/svg%3E");
+            background-size: cover;
+            background-position: center;
+        }
+        
+        .ai-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            position: relative;
+        }
+        
+        .ai-description {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        .ai-stats {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+        }
+        
+        .ai-stat {
+            text-align: center;
+        }
+        
+        .ai-stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .ai-stat-label {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            padding: 25px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            position: relative;
+            animation: modalFadeIn 0.3s ease;
+        }
+        
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 20px;
+            cursor: pointer;
+            color: #6b7280;
+            transition: var(--transition);
+        }
+        
+        .close-modal:hover {
+            color: var(--danger);
+        }
+        
+        .modal-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: var(--dark);
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #374151;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #d1d5db;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: var(--transition);
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+        }
+        
+        .toast {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--dark);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 10px;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .toast.show {
+            opacity: 1;
+        }
+        
+        .theme-switch {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            width: 40px;
+            height: 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            padding: 0 2px;
+            transition: var(--transition);
+        }
+        
+        .theme-switch::before {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: white;
+            transition: var(--transition);
+        }
+        
+        .theme-switch.dark {
+            background: rgba(0, 0, 0, 0.5);
+        }
+        
+        .theme-switch.dark::before {
+            transform: translateX(20px);
+        }
+        
+        .dark-mode {
+            --background: #121826;
+            --light: #1f2937;
+            --dark: #f9fafb;
+        }
+        
+        .dark-mode .container {
+            background: #1a2435;
+            color: #e5e7eb;
+        }
+        
+        .dark-mode .card {
+            background: #1f2937;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .dark-mode .card-title {
+            color: #f3f4f6;
+        }
+        
+        .dark-mode .stat-item {
+            background: #374151;
+        }
+        
+        .dark-mode .employee-item:hover {
+            background: #374151;
+        }
+        
+        .dark-mode .employee-name {
+            color: #f9fafb;
+        }
+        
+        .dark-mode .employee-status {
+            color: #d1d5db;
+        }
+        
+        .dark-mode .form-input {
+            background: #374151;
+            border-color: #4b5563;
+            color: #f3f4f6;
+        }
+        
+        .dark-mode .meeting-item:hover {
+            background: #374151;
+        }
+        
+        .dark-mode .meeting-time {
+            color: #f9fafb;
+        }
+        
+        .dark-mode .salary-item:hover {
+            background: #374151;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
+            <div class="theme-switch"></div>
             <div class="logo">SalaryBox</div>
             <div class="tagline">Seamless Attendance tracking and hassle-free Payroll</div>
+            <div class="date-display" id="current-date">Monday, January 1, 2023</div>
         </header>
         
         <div class="content">
@@ -424,9 +949,44 @@
                     </div>
                 </div>
                 
+                <div class="chart-container">
+                    <canvas id="attendanceChart"></canvas>
+                </div>
+                
                 <div class="attendance-actions">
-                    <div class="attendance-btn punch-in">Punch In</div>
-                    <div class="attendance-btn" style="background: #e5e7eb;">Punch Out</div>
+                    <div class="attendance-btn punch-in" id="punch-in-btn">Punch In</div>
+                    <div class="attendance-btn punch-out" id="punch-out-btn">Punch Out</div>
+                </div>
+            </div>
+            
+            <div class="ai-attendance">
+                <div class="ai-title">AI Attendance System</div>
+                <div class="ai-description">Facial recognition technology for accurate attendance marking</div>
+                
+                <div class="face-recognition" id="face-scan">
+                    <i class="fas fa-user-circle face-icon"></i>
+                    <div class="scan-line"></div>
+                    <div class="company-name">SalaryBox Inc.</div>
+                    <div class="punch-time" id="punch-time">--:--</div>
+                    <div class="location-info">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span id="location">Detecting location...</span>
+                    </div>
+                </div>
+                
+                <div class="ai-stats">
+                    <div class="ai-stat">
+                        <div class="ai-stat-value">98%</div>
+                        <div class="ai-stat-label">Accuracy</div>
+                    </div>
+                    <div class="ai-stat">
+                        <div class="ai-stat-value">0.5s</div>
+                        <div class="ai-stat-label">Recognition Time</div>
+                    </div>
+                    <div class="ai-stat">
+                        <div class="ai-stat-value">256</div>
+                        <div class="ai-stat-label">Facial Points</div>
+                    </div>
                 </div>
             </div>
             
@@ -437,28 +997,28 @@
                 </div>
                 
                 <ul class="employee-list">
-                    <li class="employee-item">
+                    <li class="employee-item" data-id="1">
                         <div class="employee-avatar">A</div>
                         <div class="employee-info">
                             <div class="employee-name">Ajay Kumar</div>
                             <div class="employee-status">Last login - 12 Jan 06:26 PM</div>
                         </div>
                     </li>
-                    <li class="employee-item">
+                    <li class="employee-item" data-id="2">
                         <div class="employee-avatar">B</div>
                         <div class="employee-info">
                             <div class="employee-name">Bhawana</div>
                             <div class="employee-status">Last login - 28 Mar 01:26 PM</div>
                         </div>
                     </li>
-                    <li class="employee-item">
+                    <li class="employee-item" data-id="3">
                         <div class="employee-avatar">J</div>
                         <div class="employee-info">
                             <div class="employee-name">Jyoti</div>
                             <div class="employee-status">Not Using App</div>
                         </div>
                     </li>
-                    <li class="employee-item">
+                    <li class="employee-item" data-id="4">
                         <div class="employee-avatar">K</div>
                         <div class="employee-info">
                             <div class="employee-name">Kamal</div>
@@ -470,7 +1030,7 @@
             
             <div class="card">
                 <div class="card-title">
-                    <span>February 2025 Attendance</span>
+                    <span id="calendar-month">February 2025</span> Attendance
                     <span>Ajay Kumar</span>
                 </div>
                 
@@ -485,44 +1045,12 @@
                         <div>Sat</div>
                     </div>
                     
-                    <div class="calendar-grid">
-                        <div class="calendar-day day-empty"></div>
-                        <div class="calendar-day day-empty"></div>
-                        <div class="calendar-day day-present">2</div>
-                        <div class="calendar-day day-present">3</div>
-                        <div class="calendar-day day-present">4</div>
-                        <div class="calendar-day day-present">5</div>
-                        <div class="calendar-day day-weekoff">6</div>
-                        
-                        <div class="calendar-day day-weekoff">7</div>
-                        <div class="calendar-day day-present">8</div>
-                        <div class="calendar-day day-present">9</div>
-                        <div class="calendar-day day-present">10</div>
-                        <div class="calendar-day day-present">11</div>
-                        <div class="calendar-day day-present">12</div>
-                        <div class="calendar-day day-weekoff">13</div>
-                        
-                        <div class="calendar-day day-weekoff">14</div>
-                        <div class="calendar-day day-present">15</div>
-                        <div class="calendar-day day-present">16</div>
-                        <div class="calendar-day day-present">17</div>
-                        <div class="calendar-day day-present">18</div>
-                        <div class="calendar-day day-halfday">19</div>
-                        <div class="calendar-day day-weekoff">20</div>
-                        
-                        <div class="calendar-day day-weekoff">21</div>
-                        <div class="calendar-day day-present">22</div>
-                        <div class="calendar-day day-present">23</div>
-                        <div class="calendar-day day-present">24</div>
-                        <div class="calendar-day day-present">25</div>
-                        <div class="calendar-day day-present">26</div>
-                        <div class="calendar-day day-weekoff">27</div>
-                        
-                        <div class="calendar-day day-weekoff">28</div>
+                    <div class="calendar-grid" id="calendar-days">
+                        <!-- Calendar days will be generated by JavaScript -->
                     </div>
                 </div>
                 
-                <button class="btn btn-primary btn-block" style="margin-top: 15px;">
+                <button class="btn btn-primary btn-block" id="download-report">
                     <i class="fas fa-download" style="margin-right: 8px;"></i>
                     Download Report
                 </button>
@@ -531,16 +1059,16 @@
             <div class="card">
                 <div class="card-title">
                     <span>Salary Processing</span>
-                    <span>Feb 2025</span>
+                    <span id="salary-month">Feb 2025</span>
                 </div>
                 
                 <div class="tab-container">
                     <div class="tabs">
-                        <div class="tab active">Earnings</div>
-                        <div class="tab">Deductions</div>
+                        <div class="tab active" data-tab="earnings">Earnings</div>
+                        <div class="tab" data-tab="deductions">Deductions</div>
                     </div>
                     
-                    <div class="tab-content active">
+                    <div class="tab-content active" id="earnings-tab">
                         <div class="salary-item">
                             <div>Basic Salary</div>
                             <div>₹16,875.00</div>
@@ -563,14 +1091,33 @@
                         </div>
                     </div>
                     
-                    <div style="margin-top: 15px; padding-top: 15px; border-top: 1px dashed #ddd;">
-                        <div class="salary-item" style="font-weight: bold;">
-                            <div>Total Payable Amount</div>
-                            <div>₹21,875.00</div>
+                    <div class="tab-content" id="deductions-tab">
+                        <div class="salary-item">
+                            <div>Provident Fund</div>
+                            <div>₹1,800.00</div>
+                        </div>
+                        <div class="salary-item">
+                            <div>Professional Tax</div>
+                            <div>₹200.00</div>
+                        </div>
+                        <div class="salary-item">
+                            <div>Insurance</div>
+                            <div>₹500.00</div>
+                        </div>
+                        <div class="salary-item">
+                            <div>Loan Deduction</div>
+                            <div>₹1,200.00</div>
                         </div>
                     </div>
                     
-                    <button class="btn btn-primary btn-block" style="margin-top: 15px;">
+                    <div style="margin-top: 15px; padding-top: 15px; border-top: 1px dashed #ddd;">
+                        <div class="salary-item" style="font-weight: bold;">
+                            <div>Total Payable Amount</div>
+                            <div>₹38,750.00</div>
+                        </div>
+                    </div>
+                    
+                    <button class="btn btn-primary btn-block" id="pay-salary">
                         <i class="fas fa-rupee-sign" style="margin-right: 8px;"></i>
                         Pay Salary
                     </button>
@@ -629,11 +1176,11 @@
                 </div>
                 
                 <div style="display: flex; gap: 10px; margin-top: 15px;">
-                    <button class="btn" style="flex: 1; background: #e5e7eb;">
+                    <button class="btn" id="add-meeting" style="flex: 1; background: #e5e7eb;">
                         <i class="fas fa-plus" style="margin-right: 8px;"></i>
                         Add Meeting
                     </button>
-                    <button class="btn" style="flex: 1; background: #e5e7eb;">
+                    <button class="btn" id="add-trip" style="flex: 1; background: #e5e7eb;">
                         <i class="fas fa-plus" style="margin-right: 8px;"></i>
                         Add Trip
                     </button>
@@ -642,60 +1189,413 @@
         </div>
         
         <div class="nav-bottom">
-            <div class="nav-item active">
+            <div class="nav-item active" data-page="home">
                 <i class="fas fa-home"></i>
                 <span>Home</span>
             </div>
-            <div class="nav-item">
+            <div class="nav-item" data-page="crm">
                 <i class="fas fa-users"></i>
                 <span>CRM</span>
             </div>
-            <div class="nav-item">
+            <div class="nav-item" data-page="settings">
                 <i class="fas fa-cog"></i>
                 <span>Settings</span>
             </div>
-            <div class="nav-item">
+            <div class="nav-item" data-page="add-staff">
                 <i class="fas fa-user-plus"></i>
                 <span>Add Staff</span>
             </div>
         </div>
     </div>
 
+    <!-- Modals -->
+    <div class="modal" id="employee-modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <div class="modal-title">Employee Details</div>
+            <div id="employee-details">
+                <!-- Employee details will be loaded here -->
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal" id="meeting-modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <div class="modal-title">Add New Meeting</div>
+            <div class="form-group">
+                <label class="form-label">Meeting Time</label>
+                <input type="time" class="form-input" id="meeting-time">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Location</label>
+                <input type="text" class="form-input" id="meeting-location" placeholder="Enter meeting location">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Duration (minutes)</label>
+                <input type="number" class="form-input" id="meeting-duration" placeholder="Enter duration">
+            </div>
+            <button class="btn btn-primary btn-block" id="save-meeting">Save Meeting</button>
+        </div>
+    </div>
+    
+    <div class="modal" id="trip-modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <div class="modal-title">Add New Trip</div>
+            <div class="form-group">
+                <label class="form-label">Start Time</label>
+                <input type="time" class="form-input" id="trip-start">
+            </div>
+            <div class="form-group">
+                <label class="form-label">End Time</label>
+                <input type="time" class="form-input" id="trip-end">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Distance (km)</label>
+                <input type="number" class="form-input" id="trip-distance" placeholder="Enter distance">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Purpose</label>
+                <input type="text" class="form-input" id="trip-purpose" placeholder="Enter trip purpose">
+            </div>
+            <button class="btn btn-primary btn-block" id="save-trip">Save Trip</button>
+        </div>
+    </div>
+    
+    <div class="toast" id="toast"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        // Simple tab functionality
-        document.querySelectorAll('.tab').forEach(tab => {
-            tab.addEventListener('click', () => {
-                // Remove active class from all tabs
-                document.querySelectorAll('.tab').forEach(t => {
-                    t.classList.remove('active');
+        // Current date display
+        const updateDate = () => {
+            const now = new Date();
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('current-date').textContent = now.toLocaleDateString('en-US', options);
+        };
+        
+        // Initialize calendar
+        const initializeCalendar = () => {
+            const monthNames = ["January", "February", "March", "April", "May", "June",
+                "July", "August", "September", "October", "November", "December"
+            ];
+            
+            const now = new Date();
+            const currentMonth = now.getMonth();
+            const currentYear = now.getFullYear();
+            
+            // Set calendar header
+            document.getElementById('calendar-month').textContent = `${monthNames[currentMonth]} ${currentYear}`;
+            
+            // Get first day of month and number of days
+            const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+            const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+            
+            // Generate calendar days
+            const calendarGrid = document.getElementById('calendar-days');
+            calendarGrid.innerHTML = '';
+            
+            // Add empty cells for days before the first day of the month
+            for (let i = 0; i < firstDay; i++) {
+                const emptyDay = document.createElement('div');
+                emptyDay.className = 'calendar-day day-empty';
+                calendarGrid.appendChild(emptyDay);
+            }
+            
+            // Add cells for each day of the month
+            for (let i = 1; i <= daysInMonth; i++) {
+                const day = document.createElement('div');
+                day.className = 'calendar-day';
+                day.textContent = i;
+                
+                // Randomly assign status for demo purposes
+                const status = Math.floor(Math.random() * 5);
+                if (status === 0 && i <= now.getDate()) {
+                    day.classList.add('day-present');
+                } else if (status === 1 && i <= now.getDate()) {
+                    day.classList.add('day-absent');
+                } else if (status === 2 && i <= now.getDate()) {
+                    day.classList.add('day-halfday');
+                } else if (status === 3 && i <= now.getDate()) {
+                    day.classList.add('day-weekoff');
+                } else if (status === 4 && i <= now.getDate()) {
+                    day.classList.add('day-holiday');
+                } else if (i > now.getDate()) {
+                    day.classList.add('day-empty');
+                    day.textContent = i;
+                }
+                
+                // Add click event
+                day.addEventListener('click', () => {
+                    if (!day.classList.contains('day-empty')) {
+                        let status = '';
+                        
+                        if (day.classList.contains('day-present')) status = 'Present';
+                        else if (day.classList.contains('day-absent')) status = 'Absent';
+                        else if (day.classList.contains('day-halfday')) status = 'Half Day';
+                        else if (day.classList.contains('day-weekoff')) status = 'Week Off';
+                        else if (day.classList.contains('day-holiday')) status = 'Holiday';
+                        
+                        showToast(`${monthNames[currentMonth]} ${i}, ${currentYear} - Marked as ${status}`);
+                    }
                 });
                 
-                // Add active class to clicked tab
-                tab.classList.add('active');
-                
-                // Here you would typically show the corresponding tab content
-                // For this demo, we're just toggling the active class
+                calendarGrid.appendChild(day);
+            }
+        };
+        
+        // Initialize attendance chart
+        const initializeChart = () => {
+            const ctx = document.getElementById('attendanceChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    datasets: [{
+                        label: 'Present',
+                        data: [12, 14, 12, 13, 15, 8, 5],
+                        backgroundColor: '#4ade80',
+                        borderRadius: 5
+                    }, {
+                        label: 'Absent',
+                        data: [2, 1, 2, 1, 0, 1, 0],
+                        backgroundColor: '#f87171',
+                        borderRadius: 5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                drawBorder: false
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        }
+                    }
+                }
             });
-        });
+        };
         
-        // Punch In/Out functionality
-        document.querySelector('.punch-in').addEventListener('click', function() {
-            alert('Punch In recorded at ' + new Date().toLocaleTimeString());
-        });
+        // Show toast notification
+        const showToast = (message) => {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        };
         
-        // Calendar day click
-        document.querySelectorAll('.calendar-day:not(.day-empty)').forEach(day => {
-            day.addEventListener('click', function() {
-                const date = this.textContent;
-                let status = '';
+        // Get location
+        const getLocation = () => {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const lat = position.coords.latitude;
+                        const lon = position.coords.longitude;
+                        
+                        // For demo purposes, we'll just show coordinates
+                        document.getElementById('location').textContent = `Lat: ${lat.toFixed(4)}, Lon: ${lon.toFixed(4)}`;
+                    },
+                    (error) => {
+                        document.getElementById('location').textContent = 'Location access denied';
+                    }
+                );
+            } else {
+                document.getElementById('location').textContent = 'Geolocation not supported';
+            }
+        };
+        
+        // Simulate AI face recognition
+        const simulateFaceRecognition = () => {
+            const faceScan = document.getElementById('face-scan');
+            faceScan.classList.add('active');
+            
+            showToast('Face recognition in progress...');
+            
+            setTimeout(() => {
+                const now = new Date();
+                const timeString = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                document.getElementById('punch-time').textContent = timeString;
                 
-                if (this.classList.contains('day-present')) status = 'Present';
-                else if (this.classList.contains('day-absent')) status = 'Absent';
-                else if (this.classList.contains('day-halfday')) status = 'Half Day';
-                else if (this.classList.contains('day-weekoff')) status = 'Week Off';
-                else if (this.classList.contains('day-holiday')) status = 'Holiday';
+                showToast('Attendance marked successfully!');
                 
-                alert(`February ${date}, 2025 - Marked as ${status}`);
+                setTimeout(() => {
+                    faceScan.classList.remove('active');
+                }, 3000);
+            }, 2000);
+        };
+        
+        // Tab functionality
+        const initializeTabs = () => {
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    // Remove active class from all tabs
+                    document.querySelectorAll('.tab').forEach(t => {
+                        t.classList.remove('active');
+                    });
+                    
+                    // Add active class to clicked tab
+                    tab.classList.add('active');
+                    
+                    // Hide all tab content
+                    document.querySelectorAll('.tab-content').forEach(content => {
+                        content.classList.remove('active');
+                    });
+                    
+                    // Show the corresponding tab content
+                    const tabName = tab.getAttribute('data-tab');
+                    document.getElementById(`${tabName}-tab`).classList.add('active');
+                });
+            });
+        };
+        
+        // Employee details modal
+        const initializeEmployeeModals = () => {
+            document.querySelectorAll('.employee-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const employeeId = item.getAttribute('data-id');
+                    const employeeName = item.querySelector('.employee-name').textContent;
+                    
+                    document.getElementById('employee-details').innerHTML = `
+                        <div style="text-align: center; margin-bottom: 20px;">
+                            <div class="employee-avatar" style="margin: 0 auto 15px;">${employeeName.charAt(0)}</div>
+                            <div style="font-size: 18px; font-weight: bold; margin-bottom: 5px;">${employeeName}</div>
+                            <div style="color: #6b7280; margin-bottom: 15px;">Employee ID: ${employeeId}</div>
+                        </div>
+                        
+                        <div class="stats-grid" style="margin-bottom: 20px;">
+                            <div class="stat-item">
+                                <div class="stat-value present">22</div>
+                                <div class="stat-label">Present</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value absent">2</div>
+                                <div class="stat-label">Absent</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value halfday">1</div>
+                                <div class="stat-label">Half Day</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">₹38,750</div>
+                                <div class="stat-label">Salary</div>
+                            </div>
+                        </div>
+                        
+                        <button class="btn btn-primary btn-block">
+                            <i class="fas fa-envelope" style="margin-right: 8px;"></i>
+                            Send Message
+                        </button>
+                    `;
+                    
+                    document.getElementById('employee-modal').style.display = 'flex';
+                });
+            });
+        };
+        
+        // Close modals
+        const initializeModalClosures = () => {
+            document.querySelectorAll('.close-modal').forEach(closeBtn => {
+                closeBtn.addEventListener('click', () => {
+                    closeBtn.closest('.modal').style.display = 'none';
+                });
+            });
+            
+            // Close modal when clicking outside
+            window.addEventListener('click', (event) => {
+                document.querySelectorAll('.modal').forEach(modal => {
+                    if (event.target === modal) {
+                        modal.style.display = 'none';
+                    }
+                });
+            });
+        };
+        
+        // Theme switcher
+        const initializeThemeSwitcher = () => {
+            const themeSwitch = document.querySelector('.theme-switch');
+            
+            themeSwitch.addEventListener('click', () => {
+                document.body.classList.toggle('dark-mode');
+                themeSwitch.classList.toggle('dark');
+                
+                const isDarkMode = document.body.classList.contains('dark-mode');
+                showToast(isDarkMode ? 'Dark mode enabled' : 'Light mode enabled');
+            });
+        };
+        
+        // Initialize everything when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            updateDate();
+            initializeCalendar();
+            initializeChart();
+            getLocation();
+            initializeTabs();
+            initializeEmployeeModals();
+            initializeModalClosures();
+            initializeThemeSwitcher();
+            
+            // Punch in/out functionality
+            document.getElementById('punch-in-btn').addEventListener('click', simulateFaceRecognition);
+            document.getElementById('punch-out-btn').addEventListener('click', simulateFaceRecognition);
+            
+            // Download report
+            document.getElementById('download-report').addEventListener('click', () => {
+                showToast('Downloading attendance report...');
+            });
+            
+            // Pay salary
+            document.getElementById('pay-salary').addEventListener('click', () => {
+                showToast('Processing salary payment...');
+            });
+            
+            // Add meeting
+            document.getElementById('add-meeting').addEventListener('click', () => {
+                document.getElementById('meeting-modal').style.display = 'flex';
+            });
+            
+            // Save meeting
+            document.getElementById('save-meeting').addEventListener('click', () => {
+                document.getElementById('meeting-modal').style.display = 'none';
+                showToast('Meeting added successfully!');
+            });
+            
+            // Add trip
+            document.getElementById('add-trip').addEventListener('click', () => {
+                document.getElementById('trip-modal').style.display = 'flex';
+            });
+            
+            // Save trip
+            document.getElementById('save-trip').addEventListener('click', () => {
+                document.getElementById('trip-modal').style.display = 'none';
+                showToast('Trip added successfully!');
+            });
+            
+            // Bottom navigation
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    document.querySelectorAll('.nav-item').forEach(nav => {
+                        nav.classList.remove('active');
+                    });
+                    item.classList.add('active');
+                    
+                    const page = item.getAttribute('data-page');
+                    showToast(`Navigating to ${page} page...`);
+                });
             });
         });
     </script>
