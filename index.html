@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SalaryBox - Employee Management System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3a0ca3;
+            --success: #4cc9f0;
+            --danger: #f72585;
+            --warning: #fca311;
+            --info: #7209b7;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --present: #4ade80;
+            --absent: #f87171;
+            --halfday: #fbbf24;
+            --weekoff: #a3a3a3;
+            --holiday: #c084fc;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fb;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            background: white;
+            min-height: 100vh;
+            position: relative;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-bottom-left-radius: 15px;
+            border-bottom-right-radius: 15px;
+        }
+        
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .tagline {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .nav-bottom {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            max-width: 480px;
+            display: flex;
+            justify-content: space-around;
+            background: white;
+            padding: 12px 0;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+        }
+        
+        .nav-item {
+            text-align: center;
+            color: #888;
+            font-size: 12px;
+        }
+        
+        .nav-item.active {
+            color: var(--primary);
+        }
+        
+        .nav-item i {
+            font-size: 20px;
+            display: block;
+            margin-bottom: 4px;
+        }
+        
+        .content {
+            padding: 20px;
+            padding-bottom: 70px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+        
+        .card-title {
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--dark);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+        
+        .stat-item {
+            background: var(--light);
+            border-radius: 10px;
+            padding: 12px;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .present { color: var(--present); }
+        .absent { color: var(--absent); }
+        .halfday { color: var(--halfday); }
+        .weekoff { color: var(--weekoff); }
+        
+        .btn {
+            padding: 12px 20px;
+            border-radius: 8px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-block {
+            width: 100%;
+        }
+        
+        .attendance-actions {
+            display: flex;
+            gap: 10px;
+            margin: 15px 0;
+        }
+        
+        .attendance-btn {
+            flex: 1;
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        .punch-in {
+            background: var(--present);
+            color: white;
+        }
+        
+        .employee-list {
+            list-style: none;
+        }
+        
+        .employee-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .employee-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 20px;
+            margin-right: 15px;
+            color: #666;
+        }
+        
+        .employee-info {
+            flex: 1;
+        }
+        
+        .employee-name {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        
+        .employee-status {
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .calendar {
+            margin-top: 20px;
+        }
+        
+        .calendar-header {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            text-align: center;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+        }
+        
+        .calendar-day {
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        
+        .day-present {
+            background: #dcfce7;
+            color: var(--present);
+        }
+        
+        .day-absent {
+            background: #fee2e2;
+            color: var(--absent);
+        }
+        
+        .day-halfday {
+            background: #fef3c7;
+            color: var(--halfday);
+        }
+        
+        .day-weekoff {
+            background: #f3f4f6;
+            color: var(--weekoff);
+        }
+        
+        .day-holiday {
+            background: #f3e8ff;
+            color: var(--holiday);
+        }
+        
+        .day-empty {
+            background: transparent;
+        }
+        
+        .tab-container {
+            margin-top: 20px;
+        }
+        
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 15px;
+        }
+        
+        .tab {
+            padding: 10px 15px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        
+        .tab.active {
+            border-bottom: 2px solid var(--primary);
+            color: var(--primary);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .salary-breakdown {
+            margin-top: 15px;
+        }
+        
+        .salary-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .salary-item:last-child {
+            border-bottom: none;
+        }
+        
+        .face-recognition {
+            text-align: center;
+            padding: 20px 0;
+        }
+        
+        .face-icon {
+            font-size: 80px;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+        
+        .company-name {
+            font-weight: 600;
+            margin: 10px 0;
+            color: #555;
+        }
+        
+        .punch-time {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 15px 0;
+        }
+        
+        .location-info {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 20px;
+        }
+        
+        .meeting-item {
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .meeting-time {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .meeting-location {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        
+        .meeting-duration {
+            font-size: 12px;
+            color: #888;
+        }
+        
+        .badge {
+            padding: 4px 8px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .badge-important {
+            background: #fee2e2;
+            color: var(--danger);
+        }
+        
+        .badge-attachment {
+            background: #e0e7ff;
+            color: var(--primary);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">SalaryBox</div>
+            <div class="tagline">Seamless Attendance tracking and hassle-free Payroll</div>
+        </header>
+        
+        <div class="content">
+            <div class="card">
+                <div class="card-title">
+                    <span>Attendance Overview</span>
+                    <span>Total Staff - 12</span>
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-value present">18</div>
+                        <div class="stat-label">Present</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value absent">1</div>
+                        <div class="stat-label">Absent</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value halfday">2</div>
+                        <div class="stat-label">Half Day</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value weekoff">4</div>
+                        <div class="stat-label">Week Off</div>
+                    </div>
+                </div>
+                
+                <div class="attendance-actions">
+                    <div class="attendance-btn punch-in">Punch In</div>
+                    <div class="attendance-btn" style="background: #e5e7eb;">Punch Out</div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-title">
+                    <span>Employee List</span>
+                    <span>All Branches ▼</span>
+                </div>
+                
+                <ul class="employee-list">
+                    <li class="employee-item">
+                        <div class="employee-avatar">A</div>
+                        <div class="employee-info">
+                            <div class="employee-name">Ajay Kumar</div>
+                            <div class="employee-status">Last login - 12 Jan 06:26 PM</div>
+                        </div>
+                    </li>
+                    <li class="employee-item">
+                        <div class="employee-avatar">B</div>
+                        <div class="employee-info">
+                            <div class="employee-name">Bhawana</div>
+                            <div class="employee-status">Last login - 28 Mar 01:26 PM</div>
+                        </div>
+                    </li>
+                    <li class="employee-item">
+                        <div class="employee-avatar">J</div>
+                        <div class="employee-info">
+                            <div class="employee-name">Jyoti</div>
+                            <div class="employee-status">Not Using App</div>
+                        </div>
+                    </li>
+                    <li class="employee-item">
+                        <div class="employee-avatar">K</div>
+                        <div class="employee-info">
+                            <div class="employee-name">Kamal</div>
+                            <div class="employee-status">Not Using App</div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="card">
+                <div class="card-title">
+                    <span>February 2025 Attendance</span>
+                    <span>Ajay Kumar</span>
+                </div>
+                
+                <div class="calendar">
+                    <div class="calendar-header">
+                        <div>Sun</div>
+                        <div>Mon</div>
+                        <div>Tue</div>
+                        <div>Wed</div>
+                        <div>Thu</div>
+                        <div>Fri</div>
+                        <div>Sat</div>
+                    </div>
+                    
+                    <div class="calendar-grid">
+                        <div class="calendar-day day-empty"></div>
+                        <div class="calendar-day day-empty"></div>
+                        <div class="calendar-day day-present">2</div>
+                        <div class="calendar-day day-present">3</div>
+                        <div class="calendar-day day-present">4</div>
+                        <div class="calendar-day day-present">5</div>
+                        <div class="calendar-day day-weekoff">6</div>
+                        
+                        <div class="calendar-day day-weekoff">7</div>
+                        <div class="calendar-day day-present">8</div>
+                        <div class="calendar-day day-present">9</div>
+                        <div class="calendar-day day-present">10</div>
+                        <div class="calendar-day day-present">11</div>
+                        <div class="calendar-day day-present">12</div>
+                        <div class="calendar-day day-weekoff">13</div>
+                        
+                        <div class="calendar-day day-weekoff">14</div>
+                        <div class="calendar-day day-present">15</div>
+                        <div class="calendar-day day-present">16</div>
+                        <div class="calendar-day day-present">17</div>
+                        <div class="calendar-day day-present">18</div>
+                        <div class="calendar-day day-halfday">19</div>
+                        <div class="calendar-day day-weekoff">20</div>
+                        
+                        <div class="calendar-day day-weekoff">21</div>
+                        <div class="calendar-day day-present">22</div>
+                        <div class="calendar-day day-present">23</div>
+                        <div class="calendar-day day-present">24</div>
+                        <div class="calendar-day day-present">25</div>
+                        <div class="calendar-day day-present">26</div>
+                        <div class="calendar-day day-weekoff">27</div>
+                        
+                        <div class="calendar-day day-weekoff">28</div>
+                    </div>
+                </div>
+                
+                <button class="btn btn-primary btn-block" style="margin-top: 15px;">
+                    <i class="fas fa-download" style="margin-right: 8px;"></i>
+                    Download Report
+                </button>
+            </div>
+            
+            <div class="card">
+                <div class="card-title">
+                    <span>Salary Processing</span>
+                    <span>Feb 2025</span>
+                </div>
+                
+                <div class="tab-container">
+                    <div class="tabs">
+                        <div class="tab active">Earnings</div>
+                        <div class="tab">Deductions</div>
+                    </div>
+                    
+                    <div class="tab-content active">
+                        <div class="salary-item">
+                            <div>Basic Salary</div>
+                            <div>₹16,875.00</div>
+                        </div>
+                        <div class="salary-item">
+                            <div>House Rent Allowance</div>
+                            <div>₹10,937.50</div>
+                        </div>
+                        <div class="salary-item">
+                            <div>Travel Allowance</div>
+                            <div>₹3,281.25</div>
+                        </div>
+                        <div class="salary-item">
+                            <div>Bonus</div>
+                            <div>₹5,468.75</div>
+                        </div>
+                        <div class="salary-item">
+                            <div>Other Earnings</div>
+                            <div>₹2,187.50</div>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 15px; padding-top: 15px; border-top: 1px dashed #ddd;">
+                        <div class="salary-item" style="font-weight: bold;">
+                            <div>Total Payable Amount</div>
+                            <div>₹21,875.00</div>
+                        </div>
+                    </div>
+                    
+                    <button class="btn btn-primary btn-block" style="margin-top: 15px;">
+                        <i class="fas fa-rupee-sign" style="margin-right: 8px;"></i>
+                        Pay Salary
+                    </button>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-title">
+                    <span>Trips and Meetings</span>
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-value">7km</div>
+                        <div class="stat-label">Total Distance</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">1</div>
+                        <div class="stat-label">Total Meetings</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">27 mins</div>
+                        <div class="stat-label">Meeting Duration</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">₹0</div>
+                        <div class="stat-label">Reimbursement</div>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 15px;">
+                    <div class="meeting-item">
+                        <div class="meeting-time">10:56AM</div>
+                        <div class="meeting-location">407&408, 4th Floor, Tower A, Unitech Cyber Park, Durga...</div>
+                        <div class="meeting-duration">Tracking Trips</div>
+                        <div>
+                            <span class="badge badge-important">important</span>
+                            <span class="badge badge-attachment">1 Attachment</span>
+                        </div>
+                    </div>
+                    
+                    <div class="meeting-item">
+                        <div class="meeting-time">10:59AM</div>
+                        <div class="meeting-location">Sector 17-8, Block F, South City I, Sector 41, Gurugram...</div>
+                        <div class="meeting-duration">Important Notes | 25 mins | Shashank</div>
+                    </div>
+                    
+                    <div class="meeting-item">
+                        <div class="meeting-time">11:29AM</div>
+                        <div class="meeting-location">DLF Cyber City, DLF Phase 2, Sector 24, Gurugram...</div>
+                        <div class="meeting-duration">Ending Trip | 7.00 km</div>
+                        <div>
+                            <span class="badge badge-attachment">1 Attachment</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="display: flex; gap: 10px; margin-top: 15px;">
+                    <button class="btn" style="flex: 1; background: #e5e7eb;">
+                        <i class="fas fa-plus" style="margin-right: 8px;"></i>
+                        Add Meeting
+                    </button>
+                    <button class="btn" style="flex: 1; background: #e5e7eb;">
+                        <i class="fas fa-plus" style="margin-right: 8px;"></i>
+                        Add Trip
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="nav-bottom">
+            <div class="nav-item active">
+                <i class="fas fa-home"></i>
+                <span>Home</span>
+            </div>
+            <div class="nav-item">
+                <i class="fas fa-users"></i>
+                <span>CRM</span>
+            </div>
+            <div class="nav-item">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+            </div>
+            <div class="nav-item">
+                <i class="fas fa-user-plus"></i>
+                <span>Add Staff</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simple tab functionality
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Remove active class from all tabs
+                document.querySelectorAll('.tab').forEach(t => {
+                    t.classList.remove('active');
+                });
+                
+                // Add active class to clicked tab
+                tab.classList.add('active');
+                
+                // Here you would typically show the corresponding tab content
+                // For this demo, we're just toggling the active class
+            });
+        });
+        
+        // Punch In/Out functionality
+        document.querySelector('.punch-in').addEventListener('click', function() {
+            alert('Punch In recorded at ' + new Date().toLocaleTimeString());
+        });
+        
+        // Calendar day click
+        document.querySelectorAll('.calendar-day:not(.day-empty)').forEach(day => {
+            day.addEventListener('click', function() {
+                const date = this.textContent;
+                let status = '';
+                
+                if (this.classList.contains('day-present')) status = 'Present';
+                else if (this.classList.contains('day-absent')) status = 'Absent';
+                else if (this.classList.contains('day-halfday')) status = 'Half Day';
+                else if (this.classList.contains('day-weekoff')) status = 'Week Off';
+                else if (this.classList.contains('day-holiday')) status = 'Holiday';
+                
+                alert(`February ${date}, 2025 - Marked as ${status}`);
+            });
+        });
+    </script>
+</body>
+</html>
