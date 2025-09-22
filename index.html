@@ -129,6 +129,7 @@
             position: relative;
             padding: 5px 10px;
             border-radius: 15px;
+            cursor: pointer;
         }
         
         .nav-item.active {
@@ -753,6 +754,8 @@
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
             position: relative;
             animation: modalFadeIn 0.3s ease;
+            max-height: 90vh;
+            overflow-y: auto;
         }
         
         @keyframes modalFadeIn {
@@ -912,6 +915,157 @@
         .dark-mode .salary-item:hover {
             background: #374151;
         }
+
+        /* Page-specific styles */
+        .page {
+            display: none;
+        }
+        
+        .page.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        /* Webcam styles */
+        #webcam-container {
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        #webcam {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        
+        #capture-btn {
+            margin-top: 15px;
+            width: 100%;
+        }
+        
+        #captured-image {
+            width: 100%;
+            max-width: 300px;
+            margin: 15px auto;
+            display: block;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* CRM Styles */
+        .crm-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .crm-stat {
+            background: var(--light);
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            transition: var(--transition);
+        }
+        
+        .crm-stat:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .crm-stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .crm-stat-label {
+            font-size: 12px;
+            color: #666;
+        }
+        
+        /* Settings Styles */
+        .settings-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .settings-item:last-child {
+            border-bottom: none;
+        }
+        
+        .settings-label {
+            font-weight: 500;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+        
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .toggle-slider {
+            background-color: var(--primary);
+        }
+        
+        input:checked + .toggle-slider:before {
+            transform: translateX(26px);
+        }
+        
+        /* Add Staff Styles */
+        .staff-form {
+            margin-top: 20px;
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .form-row .form-group {
+            flex: 1;
+            margin-bottom: 0;
+        }
     </style>
 </head>
 <body>
@@ -923,7 +1077,8 @@
             <div class="date-display" id="current-date">Monday, January 1, 2023</div>
         </header>
         
-        <div class="content">
+        <!-- Home Page -->
+        <div class="content page active" id="home-page">
             <div class="card">
                 <div class="card-title">
                     <span>Attendance Overview</span>
@@ -1184,6 +1339,265 @@
                         <i class="fas fa-plus" style="margin-right: 8px;"></i>
                         Add Trip
                     </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- CRM Page -->
+        <div class="content page" id="crm-page">
+            <div class="card">
+                <div class="card-title">
+                    <span>Customer Relationship Management</span>
+                </div>
+                
+                <div class="crm-stats">
+                    <div class="crm-stat">
+                        <div class="crm-stat-value">24</div>
+                        <div class="crm-stat-label">Total Clients</div>
+                    </div>
+                    <div class="crm-stat">
+                        <div class="crm-stat-value">8</div>
+                        <div class="crm-stat-label">New This Month</div>
+                    </div>
+                    <div class="crm-stat">
+                        <div class="crm-stat-value">₹2.4L</div>
+                        <div class="crm-stat-label">Revenue</div>
+                    </div>
+                    <div class="crm-stat">
+                        <div class="crm-stat-value">92%</div>
+                        <div class="crm-stat-label">Satisfaction</div>
+                    </div>
+                </div>
+                
+                <div class="card-title" style="margin-top: 20px;">
+                    <span>Recent Activities</span>
+                </div>
+                
+                <div class="employee-list">
+                    <div class="employee-item">
+                        <div class="employee-avatar" style="background: var(--success);">R</div>
+                        <div class="employee-info">
+                            <div class="employee-name">Rajesh Enterprises</div>
+                            <div class="employee-status">Follow-up meeting scheduled for tomorrow</div>
+                        </div>
+                    </div>
+                    <div class="employee-item">
+                        <div class="employee-avatar" style="background: var(--info);">S</div>
+                        <div class="employee-info">
+                            <div class="employee-name">Sharma & Sons</div>
+                            <div class="employee-status">Contract renewal pending</div>
+                        </div>
+                    </div>
+                    <div class="employee-item">
+                        <div class="employee-avatar" style="background: var(--warning);">P</div>
+                        <div class="employee-info">
+                            <div class="employee-name">Patel Industries</div>
+                            <div class="employee-status">Payment received - ₹75,000</div>
+                        </div>
+                    </div>
+                    <div class="employee-item">
+                        <div class="employee-avatar" style="background: var(--danger);">G</div>
+                        <div class="employee-info">
+                            <div class="employee-name">Gupta Traders</div>
+                            <div class="employee-status">Complaint registered - Resolving</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <button class="btn btn-primary btn-block" style="margin-top: 20px;">
+                    <i class="fas fa-plus" style="margin-right: 8px;"></i>
+                    Add New Client
+                </button>
+            </div>
+        </div>
+        
+        <!-- Settings Page -->
+        <div class="content page" id="settings-page">
+            <div class="card">
+                <div class="card-title">
+                    <span>Application Settings</span>
+                </div>
+                
+                <div class="settings-item">
+                    <div class="settings-label">Dark Mode</div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="dark-mode-toggle">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+                
+                <div class="settings-item">
+                    <div class="settings-label">Push Notifications</div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="notifications-toggle" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+                
+                <div class="settings-item">
+                    <div class="settings-label">Auto Punch-In</div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="auto-punch-toggle">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+                
+                <div class="settings-item">
+                    <div class="settings-label">Location Tracking</div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="location-toggle" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+                
+                <div class="settings-item">
+                    <div class="settings-label">Biometric Authentication</div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="biometric-toggle">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-title">
+                    <span>Account Settings</span>
+                </div>
+                
+                <div class="settings-item">
+                    <div class="settings-label">Change Password</div>
+                    <i class="fas fa-chevron-right" style="color: #9ca3af;"></i>
+                </div>
+                
+                <div class="settings-item">
+                    <div class="settings-label">Privacy Settings</div>
+                    <i class="fas fa-chevron-right" style="color: #9ca3af;"></i>
+                </div>
+                
+                <div class="settings-item">
+                    <div class="settings-label">Language</div>
+                    <div>English <i class="fas fa-chevron-right" style="color: #9ca3af; margin-left: 10px;"></i></div>
+                </div>
+                
+                <div class="settings-item">
+                    <div class="settings-label">Currency</div>
+                    <div>INR (₹) <i class="fas fa-chevron-right" style="color: #9ca3af; margin-left: 10px;"></i></div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-title">
+                    <span>About SalaryBox</span>
+                </div>
+                
+                <div class="settings-item">
+                    <div class="settings-label">Version</div>
+                    <div>2.5.1</div>
+                </div>
+                
+                <div class="settings-item">
+                    <div class="settings-label">Terms of Service</div>
+                    <i class="fas fa-chevron-right" style="color: #9ca3af;"></i>
+                </div>
+                
+                <div class="settings-item">
+                    <div class="settings-label">Privacy Policy</div>
+                    <i class="fas fa-chevron-right" style="color: #9ca3af;"></i>
+                </div>
+                
+                <button class="btn" style="background: #fee2e2; color: #dc2626; width: 100%; margin-top: 20px;">
+                    <i class="fas fa-sign-out-alt" style="margin-right: 8px;"></i>
+                    Logout
+                </button>
+            </div>
+        </div>
+        
+        <!-- Add Staff Page -->
+        <div class="content page" id="add-staff-page">
+            <div class="card">
+                <div class="card-title">
+                    <span>Add New Staff Member</span>
+                </div>
+                
+                <div class="staff-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">First Name</label>
+                            <input type="text" class="form-input" placeholder="Enter first name">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Last Name</label>
+                            <input type="text" class="form-input" placeholder="Enter last name">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Email Address</label>
+                        <input type="email" class="form-input" placeholder="Enter email address">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Phone Number</label>
+                        <input type="tel" class="form-input" placeholder="Enter phone number">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Department</label>
+                        <select class="form-input">
+                            <option value="">Select Department</option>
+                            <option value="sales">Sales</option>
+                            <option value="marketing">Marketing</option>
+                            <option value="development">Development</option>
+                            <option value="hr">Human Resources</option>
+                            <option value="finance">Finance</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Position</label>
+                        <input type="text" class="form-input" placeholder="Enter job position">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Salary</label>
+                        <input type="number" class="form-input" placeholder="Enter monthly salary">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Joining Date</label>
+                        <input type="date" class="form-input">
+                    </div>
+                    
+                    <button class="btn btn-primary btn-block">
+                        <i class="fas fa-user-plus" style="margin-right: 8px;"></i>
+                        Add Staff Member
+                    </button>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-title">
+                    <span>AI Face Registration</span>
+                </div>
+                
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <p>Register employee's face for AI attendance system</p>
+                </div>
+                
+                <div id="webcam-container">
+                    <video id="webcam" autoplay playsinline></video>
+                </div>
+                
+                <button class="btn btn-primary btn-block" id="capture-btn">
+                    <i class="fas fa-camera" style="margin-right: 8px;"></i>
+                    Capture Face
+                </button>
+                
+                <canvas id="canvas" style="display: none;"></canvas>
+                <img id="captured-image" style="display: none;">
+                
+                <div style="margin-top: 20px; text-align: center;">
+                    <p><small>Make sure the face is clearly visible and well-lit for accurate recognition.</small></p>
                 </div>
             </div>
         </div>
@@ -1538,6 +1952,76 @@
             });
         };
         
+        // Webcam functionality for AI attendance
+        const initializeWebcam = () => {
+            const video = document.getElementById('webcam');
+            const canvas = document.getElementById('canvas');
+            const capturedImage = document.getElementById('captured-image');
+            const captureBtn = document.getElementById('capture-btn');
+            
+            // Check if browser supports getUserMedia
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                // Access the webcam
+                navigator.mediaDevices.getUserMedia({ video: true })
+                    .then((stream) => {
+                        video.srcObject = stream;
+                    })
+                    .catch((error) => {
+                        console.error('Error accessing webcam:', error);
+                        showToast('Error accessing webcam. Please check permissions.');
+                    });
+            } else {
+                showToast('Webcam not supported by your browser.');
+            }
+            
+            // Capture image from webcam
+            captureBtn.addEventListener('click', () => {
+                const context = canvas.getContext('2d');
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                
+                // Convert canvas to data URL and display the captured image
+                const imageDataURL = canvas.toDataURL('image/png');
+                capturedImage.src = imageDataURL;
+                capturedImage.style.display = 'block';
+                
+                showToast('Face captured successfully! Processing...');
+                
+                // Simulate face recognition processing
+                setTimeout(() => {
+                    showToast('Face registered for AI attendance system!');
+                }, 2000);
+            });
+        };
+        
+        // Navigation functionality
+        const initializeNavigation = () => {
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    // Remove active class from all nav items and pages
+                    document.querySelectorAll('.nav-item').forEach(nav => {
+                        nav.classList.remove('active');
+                    });
+                    document.querySelectorAll('.page').forEach(page => {
+                        page.classList.remove('active');
+                    });
+                    
+                    // Add active class to clicked nav item
+                    item.classList.add('active');
+                    
+                    // Show the corresponding page
+                    const page = item.getAttribute('data-page');
+                    document.getElementById(`${page}-page`).classList.add('active');
+                    
+                    // Initialize webcam when on add-staff page
+                    if (page === 'add-staff') {
+                        initializeWebcam();
+                    }
+                });
+            });
+        };
+        
         // Initialize everything when DOM is loaded
         document.addEventListener('DOMContentLoaded', () => {
             updateDate();
@@ -1548,6 +2032,7 @@
             initializeEmployeeModals();
             initializeModalClosures();
             initializeThemeSwitcher();
+            initializeNavigation();
             
             // Punch in/out functionality
             document.getElementById('punch-in-btn').addEventListener('click', simulateFaceRecognition);
@@ -1583,19 +2068,6 @@
             document.getElementById('save-trip').addEventListener('click', () => {
                 document.getElementById('trip-modal').style.display = 'none';
                 showToast('Trip added successfully!');
-            });
-            
-            // Bottom navigation
-            document.querySelectorAll('.nav-item').forEach(item => {
-                item.addEventListener('click', () => {
-                    document.querySelectorAll('.nav-item').forEach(nav => {
-                        nav.classList.remove('active');
-                    });
-                    item.classList.add('active');
-                    
-                    const page = item.getAttribute('data-page');
-                    showToast(`Navigating to ${page} page...`);
-                });
             });
         });
     </script>
